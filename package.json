@@ -17,6 +17,7 @@
     "parse-data-uri": "^0.2.0",
     "pngjs": "^3.3.3",
     "request": "^2.44.0",
+    "sharp": "^0.33.3",
     "through": "^2.3.4"
   },
   "devDependencies": {

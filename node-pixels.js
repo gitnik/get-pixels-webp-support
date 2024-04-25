@@ -11,6 +11,7 @@ var fs            = require('fs')
 var request       = require('request')
 var mime          = require('mime-types')
 var parseDataURI  = require('parse-data-uri')
+var sharp         = require('sharp')
 
 function handlePNG(data, cb) {
   var png = new PNG();
@@ -102,6 +103,21 @@ function handleBMP(data, cb) {
   cb(null, result.transpose(1,0))
 }
 
+function handleWebP(data, cb) {
+  // Read the image file using sharp
+  const image = sharp(data);
+
+  // Convert the image to raw pixel data
+  image.raw().toBuffer({ resolveWithObject: true }).then(({data, info}) => {
+    var uint8Array = new Uint8Array(data);
+
+    var nshape = [ info.height, info.width, 4 ]
+    var result = ndarray(uint8Array, nshape)
+
+    cb(null, result.transpose(1,0))
+  })
+}
+
 
 function doParse(mimeType, data, cb) {
   switch(mimeType) {
@@ -112,6 +128,10 @@ function doParse(mimeType, data, cb) {
     case 'image/jpg':
     case 'image/jpeg':
       handleJPEG(data, cb)
+    break
+
+    case 'image/webp':
+      handleWebP(data, cb)
     break
 
     case 'image/gif':
